@@ -241,6 +241,28 @@ class Miracle:
                     print("Файл используется для временного хранения.")
                 win32api.SetFileAttributes(path, attr)
 
+            elif answer6 == '3':
+                print('Input hundle:')
+                handle = 0
+                input(handle)
+                inf = win32file.GetFileInformationByHandle(handle)
+                print(inf)
+
+            elif answer6 == '4':
+                handle = 0
+                print('Input hundle:')
+                input(handle)
+                print(win32file.GetFileTime(handle))
+
+            elif answer6 == '5':
+                handle = 0
+                print('Input hundle:')
+                input(handle)
+                win32file.SetFileTime(handle)
+
+    def process0(self):
+        pass
+
     def dispatch(self, value):
         method_name = 'process' + str(value)
         method = getattr(self, method_name)
@@ -251,7 +273,7 @@ answer = 9
 
 X = Miracle()
 print(0x00040000)
-while answer != 0:
+while answer != '0':
 
     print("Choose option:\n"
           "1 - To see drives list\n"

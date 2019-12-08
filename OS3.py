@@ -1,8 +1,43 @@
 import win32file, win32api
 import os
-
+import pywintypes
 from win32con import *
+from time import localtime
 
+def attribute_encoder(attr):
+    if (attr & FILE_ATTRIBUTE_ARCHIVE):
+        print("Файл или каталог - архивные.")
+    if (attr & FILE_ATTRIBUTE_COMPRESSED):
+        print("Файл или каталог сжатые.")
+    if (attr & FILE_ATTRIBUTE_DEVICE):
+        print("Зарезервировано, не используется.")
+    if (attr & FILE_ATTRIBUTE_DIRECTORY):
+        print("Дескриптор идентифицирует каталог.")
+    if (attr & FILE_ATTRIBUTE_ENCRYPTED):
+        print("Файл или каталог - зашифрованные.")
+    if (attr & FILE_ATTRIBUTE_HIDDEN):
+        print("Файл или каталог скрытые.")
+    if (attr & FILE_ATTRIBUTE_NORMAL):
+        print("Файл или каталог не имеют других установленных атрибутов.")
+    if (attr & FILE_ATTRIBUTE_NOT_CONTENT_INDEXED):
+        print("Файл не будет индексирован содержащим индексы модулем обслуживания.")
+    if (attr & FILE_ATTRIBUTE_OFFLINE):
+        print("Данные файла доступны не сразу.")
+    if (attr & FILE_ATTRIBUTE_READONLY):
+        print("Файл или каталог только для чтения.")
+    if (attr & FILE_ATTRIBUTE_REPARSE_POINT):
+        print("Файл или каталог имеет связанную точку повторной обработки")
+    if (attr & FILE_ATTRIBUTE_SPARSE_FILE):
+        print("Файл - разреженный файл.")
+    if (attr & FILE_ATTRIBUTE_SYSTEM):
+        print("Файл или каталог - используются операционной системой.")
+    if (attr & FILE_ATTRIBUTE_TEMPORARY):
+        print("Файл используется для временного хранения.")
+
+def time_encoder(time):
+    print('Creation Time: ', time[0].__str__())
+    print('Access Time: ', time[1].__str__())
+    print('Write Time: ', time[2].__str__())
 
 class Miracle:
 
@@ -43,12 +78,12 @@ class Miracle:
         FILE_VOLUME_QUOTAS = 0x00000020
         drives = win32api.GetLogicalDriveStrings()
         drives = drives.split('\000')[:-1]
-        #2print(drives[0])
+        # 2print(drives[0])
 
         choose = input()
         for drive in drives:
             if choose in drive:
-                choose=drive
+                choose = drive
         type = win32file.GetDriveType(choose)
         print(drivetype[type], "\n")
         volume = win32api.GetVolumeInformation(choose)
@@ -94,11 +129,10 @@ class Miracle:
             print("The specified volume supports disk quotas.")
 
         space = win32file.GetDiskFreeSpace(choose)
-        free_space=space[0]*space[1]*space[2]/1024/1024
-        total_space = space[0] * space[1] * space[3] / 1024 / 1024
+        free_space = space[0] * space[1] * space[2] #/ 1024 / 1024
+        total_space = space[0] * space[1] * space[3] #/ 1024 / 1024
         print('free space:', free_space, '\n')
         print('total space:', total_space, '\n')
-
 
     def process3(self):
 
@@ -124,13 +158,14 @@ class Miracle:
 
     def process4(self):
         print("Enter the name of file to create\n")
-        win32file.CreateFile(input(),
-                             win32file.GENERIC_WRITE,
-                             0,
-                             None,
-                             CREATE_NEW,
-                             0,
-                             None)
+        handle = win32file.CreateFile(input(),
+                                      win32file.GENERIC_WRITE,
+                                      0,
+                                      None,
+                                      CREATE_ALWAYS,
+                                      0,
+                                      None)
+        print(handle.__str__())
 
     def process5(self):
         answer5 = 5
@@ -138,7 +173,7 @@ class Miracle:
         while answer5 != '10':
             print('1 - To copy file\n'
                   '2 - To move file\n'
-                  '3 - '
+                  '3 - To advanced move file\n'
                   '10 - To exit to menu')
 
             answer5 = input()
@@ -150,7 +185,12 @@ class Miracle:
             elif answer5 == '2':
                 print("Enter the name of file and the directory to move\n")
                 win32api.MoveFile(input(), input())
-                #win32file.MoveFileWithProgress(input(), input())
+                # win32file.MoveFileWithProgress(input(), input())
+            elif answer5 == '3':
+                print("Enter the name of file and the directory to move\n")
+                win32api.MoveFileEx(input(),
+                                    input(),
+                                    11)
 
     def process6(self):
         answer6 = 6
@@ -166,99 +206,104 @@ class Miracle:
             answer6 = input()
 
             if answer6 == '1':
-                #print(win32con.FILE_ATTRIBUTE_*)
+                # print(win32con.FILE_ATTRIBUTE_*)
                 print("Enter the name of file to get file attributes\n")
                 attr = win32api.GetFileAttributes(input())
-                if (attr & FILE_ATTRIBUTE_ARCHIVE):
-                    print("Файл или каталог - архивные.")
-                if (attr & FILE_ATTRIBUTE_COMPRESSED):
-                    print("Файл или каталог сжатые.")
-                if (attr & FILE_ATTRIBUTE_DEVICE):
-                    print("Зарезервировано, не используется.")
-                if (attr & FILE_ATTRIBUTE_DIRECTORY):
-                    print("Дескриптор идентифицирует каталог.")
-                if (attr & FILE_ATTRIBUTE_ENCRYPTED):
-                    print("Файл или каталог - зашифрованные.")
-                if (attr & FILE_ATTRIBUTE_HIDDEN):
-                    print("Файл или каталог скрытые.")
-                if (attr & FILE_ATTRIBUTE_NORMAL):
-                    print("Файл или каталог не имеют других установленных атрибутов.")
-                if (attr & FILE_ATTRIBUTE_NOT_CONTENT_INDEXED):
-                    print("Файл не будет индексирован содержащим индексы модулем обслуживания.")
-                if (attr & FILE_ATTRIBUTE_OFFLINE):
-                    print("Данные файла доступны не сразу.")
-                if (attr & FILE_ATTRIBUTE_READONLY):
-                    print("Файл или каталог только для чтения.")
-                if (attr & FILE_ATTRIBUTE_REPARSE_POINT):
-                    print("Файл или каталог имеет связанную точку повторной обработки")
-                if (attr & FILE_ATTRIBUTE_SPARSE_FILE):
-                    print("Файл - разреженный файл.")
-                if (attr & FILE_ATTRIBUTE_SYSTEM):
-                    print("Файл или каталог - используются операционной системой.")
-                if (attr & FILE_ATTRIBUTE_TEMPORARY):
-                    print("Файл используется для временного хранения.")
+                attribute_encoder(attr)
 
             elif answer6 == '2':
-                print("Enter the name of file and the directory to move\n")
-                path = ''
+                #print("Enter the name of file\n")
+                #path = ''
                 attr = 0
-                ans=0
-                input(path)
-                print("Файл или каталог - архивные?Y-да, иначе-нет")
-                input(ans)
-                if ans == 'Y' or ans == 'y':
-                    attr+=FILE_ATTRIBUTE_ARCHIVE
-                print("Файл или каталог сжатые?Y-да, иначе-нет")
-                input(ans)
-                if ans == 'Y' or ans == 'y':
-                    attr+=FILE_ATTRIBUTE_COMPRESSED
-                print("Зарезервировано, не используется?Y-да, иначе-нет")
-                input(ans)
-                if ans == 'Y' or ans == 'y':
-                    attr+=FILE_ATTRIBUTE_DEVICE
+                #ans = 0
+                path = input("Enter the name of file\n")
+                ans = input("Файл или каталог - архивные?Y-да, иначе-нет")
 
-                if (attr & FILE_ATTRIBUTE_DIRECTORY):
-                    print("Дескриптор идентифицирует каталог.")
-                if (attr & FILE_ATTRIBUTE_ENCRYPTED):
-                    print("Файл или каталог - зашифрованные.")
-                if (attr & FILE_ATTRIBUTE_HIDDEN):
-                    print("Файл или каталог скрытые.")
-                if (attr & FILE_ATTRIBUTE_NORMAL):
-                    print("Файл или каталог не имеют других установленных атрибутов.")
-                if (attr & FILE_ATTRIBUTE_NOT_CONTENT_INDEXED):
-                    print("Файл не будет индексирован содержащим индексы модулем обслуживания.")
-                if (attr & FILE_ATTRIBUTE_OFFLINE):
-                    print("Данные файла доступны не сразу.")
-                if (attr & FILE_ATTRIBUTE_READONLY):
-                    print("Файл или каталог только для чтения.")
-                if (attr & FILE_ATTRIBUTE_REPARSE_POINT):
-                    print("Файл или каталог имеет связанную точку повторной обработки")
-                if (attr & FILE_ATTRIBUTE_SPARSE_FILE):
-                    print("Файл - разреженный файл.")
-                if (attr & FILE_ATTRIBUTE_SYSTEM):
-                    print("Файл или каталог - используются операционной системой.")
-                if (attr & FILE_ATTRIBUTE_TEMPORARY):
-                    print("Файл используется для временного хранения.")
+                if ans == 'Y' or ans == 'y':
+                    attr += FILE_ATTRIBUTE_ARCHIVE
+                ans = input("Файл или каталог сжатые?Y-да, иначе-нет")
+                if ans == 'Y' or ans == 'y':
+                    attr += FILE_ATTRIBUTE_COMPRESSED
+                ans = input("Зарезервировано, не используется?Y-да, иначе-нет")
+                if ans == 'Y' or ans == 'y':
+                    attr += FILE_ATTRIBUTE_DEVICE
+                ans = input("Дескриптор идентифицирует каталог?Y-да, иначе-нет")
+                if ans == 'Y' or ans == 'y':
+                    attr += FILE_ATTRIBUTE_DIRECTORY
+                ans = input("Файл или каталог - зашифрованные?Y-да, иначе-нет")
+                if ans == 'Y' or ans == 'y':
+                    attr += FILE_ATTRIBUTE_ENCRYPTED
+                ans = input("Файл или каталог скрытые?Y-да, иначе-нет")
+                if ans == 'Y' or ans == 'y':
+                    attr += FILE_ATTRIBUTE_HIDDEN
+                ans = input("Файл или каталог не имеют других установленных атрибутов?Y-да, иначе-нет")
+                if ans == 'Y' or ans == 'y':
+                    attr += FILE_ATTRIBUTE_NORMAL
+                ans = input("Файл не будет индексирован содержащим индексы модулем обслуживания?Y-да, иначе-нет")
+                if ans == 'Y' or ans == 'y':
+                    attr += FILE_ATTRIBUTE_NOT_CONTENT_INDEXED
+                ans = input("Данные файла доступны не сразу?Y-да, иначе-нет")
+                if ans == 'Y' or ans == 'y':
+                    attr += FILE_ATTRIBUTE_OFFLINE
+                ans = input("Файл или каталог только для чтения?Y-да, иначе-нет")
+                if ans == 'Y' or ans == 'y':
+                    attr += FILE_ATTRIBUTE_READONLY
+                ans = input("Файл или каталог имеет связанную точку повторной обработки?Y-да, иначе-нет")
+                if ans == 'Y' or ans == 'y':
+                    attr += FILE_ATTRIBUTE_REPARSE_POINT
+                ans = input("Файл - разреженный файл?Y-да, иначе-нет")
+                if ans == 'Y' or ans == 'y':
+                    attr += FILE_ATTRIBUTE_SPARSE_FILE
+                ans = input("Файл или каталог - используются операционной системой?Y-да, иначе-нет")
+                if ans == 'Y' or ans == 'y':
+                    attr += FILE_ATTRIBUTE_SYSTEM
+                ans = input("Файл используется для временного хранения?Y-да, иначе-нет")
+                if ans == 'Y' or ans == 'y':
+                    attr += FILE_ATTRIBUTE_TEMPORARY
                 win32api.SetFileAttributes(path, attr)
 
             elif answer6 == '3':
-                print('Input hundle:')
-                handle = 0
-                input(handle)
+                print('Input path to file:')
+                handle = win32file.CreateFile(input(),
+                                              win32file.GENERIC_WRITE,
+                                              0,
+                                              None,
+                                              OPEN_EXISTING,
+                                              0,
+                                              None)
+                input()
                 inf = win32file.GetFileInformationByHandle(handle)
-                print(inf)
+                attribute_encoder(inf[0])
+                time_encoder(inf[1:4])
+                #print("Serial number: ", inf[4])
+                win32api.CloseHandle(handle)
 
             elif answer6 == '4':
-                handle = 0
-                print('Input hundle:')
-                input(handle)
-                print(win32file.GetFileTime(handle))
+                print('Input path to file:')
+                handle = win32file.CreateFile(input(),
+                                              win32file.GENERIC_WRITE,
+                                              0,
+                                              None,
+                                              OPEN_EXISTING,
+                                              0,
+                                              None)
+                time = win32file.GetFileTime(handle)
+                #strftime("%a, %d %b %Y %H:%M:%S +0000", time[0])
+                time_encoder(time)
+                win32api.CloseHandle(handle)
 
             elif answer6 == '5':
-                handle = 0
-                print('Input hundle:')
-                input(handle)
-                win32file.SetFileTime(handle)
+                print('Input path to file:')
+                handle = win32file.CreateFile(input(),
+                                              win32file.GENERIC_WRITE,
+                                              0,
+                                              None,
+                                              OPEN_EXISTING,
+                                              0,
+                                              None)
+                PyTIME = pywintypes.Time(localtime())
+                win32file.SetFileTime(handle, PyTIME, PyTIME, PyTIME, False)
+                win32api.CloseHandle(handle)
 
     def process0(self):
         pass
@@ -268,11 +313,15 @@ class Miracle:
         method = getattr(self, method_name)
         return method()
 
+class myerr(BaseException):
+    def __init__(self):
+        pass
+
 
 answer = 9
 
 X = Miracle()
-print(0x00040000)
+#print(FILE_ATTRIBUTE_READONLY)
 while answer != '0':
 
     print("Choose option:\n"
@@ -288,5 +337,7 @@ while answer != '0':
 
     try:
         X.dispatch(answer)
+    except AttributeError as a:
+        raise myerr()
     except ValueError as e:
         raise ValueError('Undefined unit: {}'.format(e.args[0]))
